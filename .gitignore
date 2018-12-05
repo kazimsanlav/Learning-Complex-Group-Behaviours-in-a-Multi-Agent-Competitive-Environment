@@ -1,1 +1,4 @@
 .directory
+*.pyc
+.vscode
+*.json
