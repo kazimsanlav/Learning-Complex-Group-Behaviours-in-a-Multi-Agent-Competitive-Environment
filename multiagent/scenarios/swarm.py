@@ -8,7 +8,7 @@ class Scenario(BaseScenario):
         world = World()
         # set any world properties first
         world.dim_c = 0
-        num_good_agents = 3
+        num_good_agents = 2
         num_adversaries = 1
         num_agents = num_adversaries + num_good_agents
         num_landmarks = 0
@@ -22,8 +22,8 @@ class Scenario(BaseScenario):
             agent.size = 0.075 if agent.adversary else 0.05
             agent.accel = 3.0 if agent.adversary else 4.0
             #agent.accel = 20.0 if agent.adversary else 25.0
-            # agent.max_speed = 1.0 if agent.adversary else 1.3
-            agent.max_speed = 1.0/10 if agent.adversary else 1.3/10
+            agent.max_speed = 1.0 if agent.adversary else 1.3
+            #! agent.max_speed = 1.0/10 if agent.adversary else 1.3/10
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
@@ -87,6 +87,14 @@ class Scenario(BaseScenario):
         main_reward = self.adversary_reward(agent, world) if agent.adversary else self.agent_reward(agent, world)
         return main_reward
 
+    def bound(self,x):
+        # agents are penalized for exiting the screen, so that they can be caught by the adversaries
+        if x < 0.9:
+            return 0
+        if x < 1.0:
+            return (x - 0.9) * 10
+        return min(np.exp(2 * x - 2), 10)
+
     def agent_reward(self, agent, world):
         # Agents are negatively rewarded if caught by adversaries
         rew = 0
@@ -100,16 +108,9 @@ class Scenario(BaseScenario):
                 if self.is_collision(a, agent):
                     rew -= 10
 
-        # agents are penalized for exiting the screen, so that they can be caught by the adversaries
-        def bound(x):
-            if x < 0.9:
-                return 0
-            if x < 1.0:
-                return (x - 0.9) * 10
-            return min(np.exp(2 * x - 2), 10)
         for p in range(world.dim_p):
             x = abs(agent.state.p_pos[p])
-            rew -= bound(x)
+            rew -= self.bound(x)
 
         return rew
 
@@ -127,6 +128,11 @@ class Scenario(BaseScenario):
                 for adv in adversaries:
                     if self.is_collision(ag, adv):
                         rew += 10
+                        
+        for p in range(world.dim_p):
+            x = abs(agent.state.p_pos[p])
+            rew -= self.bound(x)
+            
         return rew
 
     def observation(self, agent, world):
@@ -146,3 +152,5 @@ class Scenario(BaseScenario):
             # if not other.adversary:
             other_vel.append(other.state.p_vel)
         return np.concatenate([agent.state.p_vel] + [agent.state.p_pos] + entity_pos + other_pos + other_vel)
+
+    
