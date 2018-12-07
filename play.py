@@ -109,7 +109,7 @@ for e in range(n_episodes): # iterate over new episodes of the game
     states = env.reset() # reset states at start of each new episode of the game
     
     for step in range(100): # for every step
-        env.render()
+        if(e > 500): env.render();
         
         all_actions=[]
         for state,agent in zip(states,agents):
@@ -117,8 +117,6 @@ for e in range(n_episodes): # iterate over new episodes of the game
             action_i = agent.act(state)
             all_actions.append(action_i)
         
-        print(all_actions)
-
         next_states, rewards, done, info = env.step(all_actions) # take a step (update all agents)
 
         for state in next_states:
