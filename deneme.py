@@ -4,18 +4,20 @@ import numpy as np
 import random
 
 # creates an multiagent environment which has reset, render, step
-env = make_env_.make_env('swarm') #! my enviorenment
+env = make_env_.make_env('swarm') #! 2vs1 Swarm environment
 # env = make_env_.make_env('simple_tag_guided_1v2')
 # create interactive policies for each agent
 # policies = [InteractivePolicy(env,i) for i in range(env.n)]
 print(env.observation_space)
 print(env.action_space)
-# state_size = env.observation_space.shape[0]
-# state_size
+# env.observation_space
+
 
 # exit()
 # print(policies)
 # exit()
+
+
 def sample_actions():
     action = [env.action_space[i].sample() for i in range(env.n)]
     action.insert(0,0)
@@ -25,35 +27,35 @@ def sample_actions():
 def deterministic_actions():
     action = fixed() 
     action.insert(0,0)
-    print(action)
+    # print(action)
     return action
 
 def fixed():
-	act = [0,0,0,1]
+	act = [0,1,0,0]
 	return act
 
-# def genetic_actions():	
-# 	action = []
-# 	for adv in env.agents:
-# 		if adv.advesary:
-# 			action.append([1.0,0])
-# 		else:
-# 			action.append([-1.0,0])
-# 	action.insert(0,0)
-# 	return action
-
-for i_episode in range(5):# number of simulations 
+for i_episode in range(1):# number of simulations 
     observation = env.reset()
-    for t in range(100):# number of steps
-        env.render()
+    # print(len(observation[0]))
+    for t in range(1):# number of steps
+        # env.render()
 	
-        my_action = [ sample_actions()  for i in range(env.n) ]
+        my_action = [ deterministic_actions()  for i in range(env.n) ]
         
-        observation, reward, done, info = env.step(my_action)
+        next_state, reward, done, info = env.step(my_action)
+        print('*'*30)
+        print('next_state\n',next_state)
+        print('\nreward\n',reward)
+        print('\ndone\n',done)
+        print('\ninfo\n',info)
+        print('*'*30)
+        # print(len(observation)) 
+        # print(observation[0].shape) 
+        # print(observation[0]) 
 
-        # print(reward)
-
-# genetic_actions()
 env.close()
 
 
+# obs = [np.array([ 0.        ,  0.        , -0.71170829,  0.82181501,  0.62097461, -0.89593826,  1.14709038,  0.16188317,  0.        ,  0.        ,0.        ,  0.        ]),
+#  np.array([ 0.        ,  0.        , -0.09073367, -0.07412326, -0.62097461,  0.89593826,  0.52611577,  1.05782144,  0.        ,  0.        ,0.        ,  0.        ]), 
+#  np.array([ 0.        ,  0.        ,  0.43538209,  0.98369818, -1.14709038, -0.16188317, -0.52611577, -1.05782144,  0.        ,  0.        ,0.        ,  0.        ])]
