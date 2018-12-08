@@ -30,7 +30,7 @@ n_steps = 100 # number of steps
 
 updating_target_freq = 50 # rate C, reset W` <- W
 
-output_dir = 'model_output/swarm/DQQ_fixed_replay'
+output_dir = 'model_output/swarm/DQQ_fixed_target'
 
 
 
