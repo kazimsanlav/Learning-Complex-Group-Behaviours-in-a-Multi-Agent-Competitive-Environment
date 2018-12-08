@@ -23,7 +23,7 @@ class Scenario(BaseScenario):
             agent.accel = 3.0 if agent.adversary else 4.0
             #agent.accel = 20.0 if agent.adversary else 25.0
             agent.max_speed = 1.0 if agent.adversary else 1.3
-            #! agent.max_speed = 1.0/10 if agent.adversary else 1.3/10
+            #? agent.max_speed = 1.0/10 if agent.adversary else 1.3/10
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
@@ -56,15 +56,22 @@ class Scenario(BaseScenario):
 
 
     def benchmark_data(self, agent, world):
-        # returns data for benchmarking purposes
+        # returns number of collisions for adversary agent
         if agent.adversary:
             collisions = 0
-            for a in self.good_agents(world):
-                if self.is_collision(a, agent):
+            for ga in self.good_agents(world):
+                if self.is_collision(ga, agent):
+                    collisions += 1
+            return collisions
+
+        if not agent.adversary:
+            collisions = 0
+            for adv in self.adversaries(world):
+                if self.is_collision(adv, agent):
                     collisions += 1
             return collisions
         else:
-            return 0
+            return -1
 
 
     def is_collision(self, agent1, agent2):
@@ -107,7 +114,7 @@ class Scenario(BaseScenario):
             for a in adversaries:
                 if self.is_collision(a, agent):
                     rew -= 10
-
+        #! punishment 
         for p in range(world.dim_p):
             x = abs(agent.state.p_pos[p])
             rew -= self.bound(x)
@@ -128,7 +135,7 @@ class Scenario(BaseScenario):
                 for adv in adversaries:
                     if self.is_collision(ag, adv):
                         rew += 10
-                        
+        #! punishment                
         for p in range(world.dim_p):
             x = abs(agent.state.p_pos[p])
             rew -= self.bound(x)
