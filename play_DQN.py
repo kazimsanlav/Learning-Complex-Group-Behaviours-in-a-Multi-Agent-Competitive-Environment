@@ -28,12 +28,11 @@ batch_size = 32 # used for batch gradient descent update
 n_episodes = 1001 # number of simulations 
 n_steps = 100 # number of steps
 
-output_dir = 'model_output/swarm'
+output_dir = 'model_output/swarm/DQN'
 
 
 
 #^ Define agent
-
 class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size # defined above
@@ -77,7 +76,7 @@ class DQNAgent:
     def replay(self, batch_size): # method that trains NN with experiences sampled from memory
         minibatch = random.sample(self.memory, batch_size) # sample a minibatch from memory
         for state, action, reward, next_state, done in minibatch: # extract data for each minibatch sample
-            target = reward # if done (boolean whether game ended or not, i.e., whether final state or not), then target = reward
+            target = reward # if done then target = reward
             state = np.reshape(state, [1, state_size]) #! reshape the state for DQN model            
             next_state = np.reshape(next_state, [1, state_size]) #! reshape the state for DQN model
             
@@ -87,7 +86,8 @@ class DQNAgent:
             
             target_f = self.model.predict(state) # approximately map current state to future discounted reward
             target_f[0][np.argmax(action)-1] = target
-            history = self.model.fit(state, target_f, epochs=1, verbose=0) # single epoch of training with x=state, y=target_f; fit decreases loss btwn target_f and y_hat
+            history = self.model.fit(state, target_f, epochs=1, verbose=0) 
+            # single epoch of training with x=state, y=target_f
        
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
@@ -175,7 +175,7 @@ for episode in range(n_episodes): # iterate over new episodes of the game
     for i,agent in  enumerate(agents):
         if len(agent.memory) > batch_size:
             history = agent.replay(batch_size) # train the agent by replaying the experiences of the episode
-            # list all data in history
+            
             losses[i] += history.history['loss'][0]
     
     # ────────────────────────────────────────────────────────────────────────────────

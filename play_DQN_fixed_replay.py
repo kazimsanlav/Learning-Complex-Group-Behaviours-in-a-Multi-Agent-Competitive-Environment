@@ -93,8 +93,9 @@ class DQNAgent:
             
             target_f = self.evaluation_model.predict(state) # approximately map current state to future discounted reward
             target_f[0][np.argmax(action)-1] = target
-            history = self.evaluation_model.fit(state, target_f, epochs=1, verbose=0) # single epoch of training with x=state, y=target_f; fit decreases loss btwn target_f and y_hat
-       
+            history = self.evaluation_model.fit(state, target_f, epochs=1, verbose=0) 
+            # single epoch of training with x=state
+            
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
@@ -113,18 +114,16 @@ agents = [ DQNAgent(state_size, action_size) for agent in range(num_of_agents) ]
 
 #! create model output folders
 for i,agent in enumerate(agents):
-    for model in ['evaluation','target']:
-        if not os.path.exists(output_dir + '/'+ model + "/weights/agent{}".format(i)):
-            os.makedirs(output_dir + '/'+ model + "/weights/agent{}".format(i))
+    if not os.path.exists(output_dir + "/weights/agent{}".format(i)):
+        os.makedirs(output_dir + "/weights/agent{}".format(i))
 
 #! load weights if exist    
 load_episode = 100
 for i,agent in enumerate(agents):
-    for model in ['evaluation','target']:
-        file_name = (output_dir + '/'+ model + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(load_episode) + ".hdf5")
-        if os.path.isfile(file_name):
-            print("Loading of {} model weights to use for agent {}".format(model,i))
-            agent.load(file_name)
+    file_name = (output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(load_episode) + ".hdf5")
+    if os.path.isfile(file_name):
+        print("Loading of {} model weights to use for agent {}".format(i))
+        agent.load(file_name)
 
 #! statistics
 # ────────────────────────────────────────────────────────────────────────────────
@@ -152,7 +151,7 @@ for episode in range(n_episodes): # iterate over new episodes of the game
    
     for step in range(n_steps): # for every step
     # ────────────────────────────────────────────────────────────────────────────────
-        #! reset terget model weights
+        #! reset target model weights
         if(step % updating_target_freq == 0):
             for agent in agents:
                 agent.update_target_weights()
@@ -191,7 +190,7 @@ for episode in range(n_episodes): # iterate over new episodes of the game
     for i,agent in  enumerate(agents):
         if len(agent.memory) > batch_size:
             history = agent.replay(batch_size) # train the agent by replaying the experiences of the episode
-            # list all data in history
+            
             losses[i] += history.history['loss'][0]
     
     # ────────────────────────────────────────────────────────────────────────────────
@@ -211,6 +210,7 @@ for episode in range(n_episodes): # iterate over new episodes of the game
     #! save weights write statistics
     if episode % 50 == 0:
         for i,agent in enumerate(agents):
-            agent.save(output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
+            file_name = (output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
+            agent.save(file_name)
 
     
