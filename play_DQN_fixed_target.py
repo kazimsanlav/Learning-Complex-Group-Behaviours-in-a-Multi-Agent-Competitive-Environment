@@ -26,20 +26,20 @@ action_size = 4 # discrete action space [up,down,left,right]
 
 batch_size = 32 # used for batch gradient descent update
 
-testing = True # render or not, expodation vs. exploration
+testing = False # render or not, expodation vs. exploration
 
-n_episodes = 1000 if not testing else 100 # number of simulations 
+n_episodes = 100000 if not testing else 100 # number of simulations 
 n_steps = 100 if not testing else 300 # number of steps
 
 load_episode = 1000 
 
 updating_target_freq = 50 # rate C, reset W` <- W
 
-output_dir = 'model_output/swarm/DQQ_fixed_target'
+output_dir = 'model_output/swarm/DQQ_fixed_target_10v1'
 
 # ────────────────────────────────────────────────────────────────────────────────
-if testing:
-   env = wrappers.Monitor(env,(output_dir+'/movies'), force= True) #save as mp4
+# if testing:
+#    env = wrappers.Monitor(env,(output_dir+'/movies'), force= True) #save as mp4
 # ────────────────────────────────────────────────────────────────────────────────
 
 
@@ -52,17 +52,17 @@ class DQNAgent:
         self.memory = deque(maxlen=2000) # double-ended queue; removes the oldest element each time that you add a new element.
         self.gamma = 0.95 # discount rate
         self.epsilon = 1.0 if not testing else 0.1 # exploration rate: how much to act randomly; more initially than later due to epsilon decay
-        self.epsilon_decay = (1-0.001) # exponential decay rate for exploration prob
+        self.epsilon_decay = (1-0.0005) # exponential decay rate for exploration prob
         self.epsilon_min = 0.01 # minimum amount of random exploration permitted
-        self.learning_rate = 0.001 # learning rate of NN
+        self.learning_rate = 0.0005 # learning rate of NN
         self.evaluation_model = self._build_model()  
         self.target_model = self._build_model()  
     
     def _build_model(self):
         # neural net for approximating Q-value function: Q*(s,a) ~ Q(s,a;W)
         model = Sequential() #fully connected NN
-        model.add(Dense(24, input_dim=self.state_size, activation='relu')) # 1st hidden layer
-        model.add(Dense(24, activation='relu')) # 2nd hidden layer
+        model.add(Dense(state_size*2, input_dim=self.state_size, activation='relu')) # 1st hidden layer
+        model.add(Dense(state_size*2, activation='relu')) # 2nd hidden layer
         model.add(Dense(self.action_size, activation='linear')) # 4 actions, so 4 output neurons
         model.compile(loss='mse',optimizer=Adam(lr=self.learning_rate))
         return model
@@ -141,13 +141,17 @@ loss_ = ['loss_{}'.format(i) for i in range(num_of_agents)]
 reward_ = ['reward_{}'.format(i) for i in range(num_of_agents)]
 statistics = ['episode','epsilon']+collision_+reward_+loss_
 
-with open(output_dir + '/statistics.csv', 'a') as csvFile:
-    writer = csv.writer(csvFile)
-    writer.writerow(statistics)
-csvFile.close()
+if not testing:
+    with open(output_dir + '/statistics.csv', 'a') as csvFile:
+        writer = csv.writer(csvFile)
+        writer.writerow(statistics)
+    csvFile.close()
 # ────────────────────────────────────────────────────────────────────────────────
 
-for episode in range(n_episodes): # iterate over new episodes of the game
+for episode in range(1,n_episodes+1): # iterate over new episodes of the game
+    if(episode % 500 == 0): 
+        n_steps+=50
+        updating_target_freq+=25
     # ────────────────────────────────────────────────────────────────────────────────
     #^ for statistics
     statictics_row=[]
@@ -158,19 +162,18 @@ for episode in range(n_episodes): # iterate over new episodes of the game
 
     states = env.reset() # reset states at start of each new episode of the game
    
-    for step in range(n_steps): # for every step
+    for step in range(1,n_steps+1): # for every step
     # ────────────────────────────────────────────────────────────────────────────────
         #! reset target model weights
         if(step % updating_target_freq == 0):
             for agent in agents:
                 agent.update_target_weights()
     # ────────────────────────────────────────────────────────────────────────────────
-
+        if (testing): env.render();
         # ─────────────────────────────────────────────────────────────────
         # if(episode > 100 and episode < 110): env.render();
         # if(episode > 500 and episode < 510): env.render();
         # if(episode > 950 and episode < 1000): env.render(); 
-        if (testing): env.render();   
         # ─────────────────────────────────────────────────────────────────
         all_actions=[]
         for state,agent in zip(states,agents):
@@ -211,16 +214,18 @@ for episode in range(n_episodes): # iterate over new episodes of the game
     statictics_row += (rewards)
     statictics_row += (losses)
 
-    with open(output_dir + '/statistics.csv', 'a') as csvFile:
-        writer = csv.writer(csvFile)
-        writer.writerow(statictics_row)
-    csvFile.close()
+    if not testing:
+        with open(output_dir + '/statistics.csv', 'a') as csvFile:
+            writer = csv.writer(csvFile)
+            writer.writerow(statictics_row)
+        csvFile.close()
 
     # ────────────────────────────────────────────────────────────────────────────────
     #! save weights
-    if episode % 50 == 0:
-        for i,agent in enumerate(agents):
-            file_name = (output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
-            agent.save(file_name)
+    if not testing:
+        if episode % 50 == 0:
+            for i,agent in enumerate(agents):
+                file_name = (output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
+                agent.save(file_name)
 
     

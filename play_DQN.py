@@ -26,14 +26,14 @@ action_size = 4 # discrete action space [up,down,left,right]
 
 batch_size = 32 # used for batch gradient descent update
 
-testing = True # render or not, expodation vs. exploration
+testing = False # render or not, expodation vs. exploration
 
-n_episodes = 4001 if not testing else 100 # number of simulations 
+n_episodes = 100000 if not testing else 100 # number of simulations 
 n_steps = 100 if not testing else 300 # number of steps
 
-load_episode = 3950 
+load_episode = 2500 
 
-output_dir = 'model_output/swarm/DQN'
+output_dir = 'model_output/swarm/DQN_3v1'
 
 # # ────────────────────────────────────────────────────────────────────────────────
 # if testing:
@@ -57,8 +57,8 @@ class DQNAgent:
     def _build_model(self):
         # neural net for approximating Q-value function: Q*(s,a) ~ Q(s,a;W)
         model = Sequential() #fully connected NN
-        model.add(Dense(24, input_dim=self.state_size, activation='relu')) # 1st hidden layer
-        model.add(Dense(24, activation='relu')) # 2nd hidden layer
+        model.add(Dense(state_size*2, input_dim=self.state_size, activation='relu')) # 1st hidden layer
+        model.add(Dense(state_size*2, activation='relu')) # 2nd hidden layer
         model.add(Dense(self.action_size, activation='linear')) # 4 actions, so 4 output neurons
         model.compile(loss='mse',optimizer=Adam(lr=self.learning_rate))
         return model
@@ -139,7 +139,8 @@ if not testing:
     csvFile.close()
 # ────────────────────────────────────────────────────────────────────────────────
 
-for episode in range(n_episodes): # iterate over new episodes of the game
+for episode in range(1,n_episodes+1): # iterate over new episodes of the game
+    if(episode % 500 == 0): n_steps+=50;
     # ────────────────────────────────────────────────────────────────────────────────
     #^ for statistics
     statictics_row=[]
@@ -150,7 +151,7 @@ for episode in range(n_episodes): # iterate over new episodes of the game
 
     states = env.reset() # reset states at start of each new episode of the game
     
-    for step in range(n_steps): # for every step
+    for step in range(1,n_steps+1): # for every step
         if (testing): env.render();
         # ─────────────────────────────────────────────────────────────────
         # if(episode > 100 and episode < 110): env.render();
@@ -204,8 +205,9 @@ for episode in range(n_episodes): # iterate over new episodes of the game
 
     # ────────────────────────────────────────────────────────────────────────────────
     #! save weights
-    if episode % 50 == 0:
-        for i,agent in enumerate(agents):
-            agent.save(output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
+    if not testing:
+        if episode % 50 == 0:
+            for i,agent in enumerate(agents):
+                agent.save(output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
 
     
