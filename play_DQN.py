@@ -28,6 +28,9 @@ batch_size = 32 # used for batch gradient descent update
 n_episodes = 1001 # number of simulations 
 n_steps = 100 # number of steps
 
+load_episode = 1000 
+testing = True # render or not, expodation vs. exploration
+
 output_dir = 'model_output/swarm/DQN'
 
 
@@ -39,7 +42,7 @@ class DQNAgent:
         self.action_size = action_size # defined above
         self.memory = deque(maxlen=2000) # double-ended queue; removes the oldest element each time that you add a new element.
         self.gamma = 0.95 # discount rate
-        self.epsilon = 1.0 # exploration rate: how much to act randomly; more initially than later due to epsilon decay
+        self.epsilon = 1.0 if not testing else 0.1 # exploration rate: how much to act randomly; more initially than later due to epsilon decay
         self.epsilon_decay = (1-0.001) # exponential decay rate for exploration prob
         self.epsilon_min = 0.01 # minimum amount of random exploration permitted
         self.learning_rate = 0.001 # learning rate of NN
@@ -110,7 +113,6 @@ for i,agent in enumerate(agents):
         os.makedirs(output_dir + "/weights/agent{}".format(i))
 
 #! load weights if exist    
-load_episode = 100
 for i,agent in enumerate(agents):
     file_name = (output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(load_episode) + ".hdf5")
     if os.path.isfile(file_name):
@@ -142,10 +144,11 @@ for episode in range(n_episodes): # iterate over new episodes of the game
     states = env.reset() # reset states at start of each new episode of the game
     
     for step in range(n_steps): # for every step
+        if (testing): env.render();
         # ─────────────────────────────────────────────────────────────────
         # if(episode > 100 and episode < 110): env.render();
         # if(episode > 500 and episode < 510): env.render();
-        if(episode > 950 and episode < 1000): env.render();    
+        # if(episode > 950 and episode < 1000): env.render();   
         # ─────────────────────────────────────────────────────────────────
         all_actions=[]
         for state,agent in zip(states,agents):
@@ -179,22 +182,22 @@ for episode in range(n_episodes): # iterate over new episodes of the game
             losses[i] += history.history['loss'][0]
     
     # ────────────────────────────────────────────────────────────────────────────────
-    #* episode,epsilon,collisions,rewards,losses statistics written    
+    #! episode,epsilon,collisions,rewards,losses statistics written    
     statictics_row.append(episode)      
     statictics_row.append(agents[0].epsilon)
     statictics_row += (collisions)
     statictics_row += (rewards)
     statictics_row += (losses)
 
-    with open(output_dir + '/statistics.csv', 'a') as csvFile:
-        writer = csv.writer(csvFile)
-        writer.writerow(statictics_row)
-    csvFile.close()
+    # with open(output_dir + '/statistics.csv', 'a') as csvFile:
+    #     writer = csv.writer(csvFile)
+    #     writer.writerow(statictics_row)
+    # csvFile.close()
 
     # ────────────────────────────────────────────────────────────────────────────────
     #! save weights write statistics
-    if episode % 50 == 0:
-        for i,agent in enumerate(agents):
-            agent.save(output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
+    # if episode % 50 == 0:
+    #     for i,agent in enumerate(agents):
+    #         agent.save(output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
 
     

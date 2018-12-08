@@ -23,7 +23,7 @@ class Scenario(BaseScenario):
             agent.accel = 3.0 if agent.adversary else 4.0
             #agent.accel = 20.0 if agent.adversary else 25.0
             agent.max_speed = 1.0 if agent.adversary else 1.3
-            #? agent.max_speed = 1.0/10 if agent.adversary else 1.3/10
+            #! agent.max_speed = 1.0/5 if agent.adversary else 1.3/5
         # add landmarks
         world.landmarks = [Landmark() for i in range(num_landmarks)]
         for i, landmark in enumerate(world.landmarks):
