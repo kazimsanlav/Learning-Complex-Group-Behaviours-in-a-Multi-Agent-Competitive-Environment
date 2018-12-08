@@ -1,6 +1,7 @@
 
 import random
 import gym
+from gym import wrappers
 import make_env_
 import numpy as np
 import csv
@@ -16,7 +17,7 @@ env = make_env_.make_env('swarm',benchmark=True)
 
 num_of_agents = env.n
 
-state_size = 12 # [agent's velocity(2d vector) + agent's position(2d vector) + 
+state_size = (2+2+2*(num_of_agents-1)*2) # [agent's velocity(2d vector) + agent's position(2d vector) + 
                 # other agent's relative position((n-1)*2d vector) + 
                 # other agent's relative velocity((n-1)*2d vector)) ] 
                 # in 3 agent case it is 2+2+2*2+2*2=12
@@ -25,16 +26,21 @@ action_size = 4 # discrete action space [up,down,left,right]
 
 batch_size = 32 # used for batch gradient descent update
 
-n_episodes = 1001 # number of simulations 
-n_steps = 100 # number of steps
+testing = True # render or not, expodation vs. exploration
+
+n_episodes = 1000 if not testing else 100 # number of simulations 
+n_steps = 100 if not testing else 300 # number of steps
 
 load_episode = 1000 
-testing = True # render or not, expodation vs. exploration
 
 updating_target_freq = 50 # rate C, reset W` <- W
 
 output_dir = 'model_output/swarm/DQQ_fixed_target'
 
+# ────────────────────────────────────────────────────────────────────────────────
+if testing:
+   env = wrappers.Monitor(env,(output_dir+'/movies'), force= True) #save as mp4
+# ────────────────────────────────────────────────────────────────────────────────
 
 
 #^ Define agent
@@ -211,7 +217,7 @@ for episode in range(n_episodes): # iterate over new episodes of the game
     csvFile.close()
 
     # ────────────────────────────────────────────────────────────────────────────────
-    #! save weights write statistics
+    #! save weights
     if episode % 50 == 0:
         for i,agent in enumerate(agents):
             file_name = (output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
