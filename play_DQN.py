@@ -26,19 +26,19 @@ action_size = 4 # discrete action space [up,down,left,right]
 
 batch_size = 32 # used for batch gradient descent update
 
-testing = False # render or not, expodation vs. exploration
+testing = True # render or not, expodation vs. exploration
 
-n_episodes = 100000 if not testing else 100 # number of simulations 
-n_steps = 100 if not testing else 300 # number of steps
+n_episodes = 100000 if not testing else 5 # number of simulations 
+n_steps = 100 if not testing else 500 # number of steps
 
-load_episode = 2500 
+load_episode = 15100 
 
-output_dir = 'model_output/swarm/DQN_3v1'
+output_dir = 'model_output/swarm/DQN_2v1'
 
 # # ────────────────────────────────────────────────────────────────────────────────
-# if testing:
-#    env = wrappers.Monitor(env,(output_dir+'/movies'), force= True) #save as mp4
-# # ────────────────────────────────────────────────────────────────────────────────
+if testing:
+    import pyautogui
+#  ────────────────────────────────────────────────────────────────────────────────
 
 
 #^ Define agent
@@ -152,7 +152,13 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
     states = env.reset() # reset states at start of each new episode of the game
     
     for step in range(1,n_steps+1): # for every step
-        if (testing): env.render();
+        if (testing): 
+            env.render()
+            # if (step % 4 == 0 ):
+            #     # Take screenshot
+            #     pic = pyautogui.screenshot()
+            #     # Save the image
+            #     pic.save(output_dir+'/screenshots/Screenshot_{}.png'.format(step)) 
         # ─────────────────────────────────────────────────────────────────
         # if(episode > 100 and episode < 110): env.render();
         # if(episode > 500 and episode < 510): env.render();

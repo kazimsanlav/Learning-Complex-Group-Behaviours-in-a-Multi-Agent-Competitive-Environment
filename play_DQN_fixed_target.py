@@ -26,20 +26,20 @@ action_size = 4 # discrete action space [up,down,left,right]
 
 batch_size = 32 # used for batch gradient descent update
 
-testing = False # render or not, expodation vs. exploration
+testing = True # render or not, expodation vs. exploration
 
-n_episodes = 100000 if not testing else 100 # number of simulations 
-n_steps = 100 if not testing else 300 # number of steps
+n_episodes = 100000 if not testing else 1 # number of simulations 
+n_steps = 100 if not testing else 32 # number of steps
 
-load_episode = 1000 
+load_episode = 5250 
 
 updating_target_freq = 50 # rate C, reset W` <- W
 
 output_dir = 'model_output/swarm/DQQ_fixed_target_10v1'
 
 # ────────────────────────────────────────────────────────────────────────────────
-# if testing:
-#    env = wrappers.Monitor(env,(output_dir+'/movies'), force= True) #save as mp4
+if testing:
+    import pyautogui
 # ────────────────────────────────────────────────────────────────────────────────
 
 
@@ -127,11 +127,11 @@ for i,agent in enumerate(agents):
         os.makedirs(output_dir + "/weights/agent{}".format(i))
 
 #! load weights if exist    
-load_episode = 100
+
 for i,agent in enumerate(agents):
     file_name = (output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(load_episode) + ".hdf5")
     if os.path.isfile(file_name):
-        print("Loading of {} model weights to use for agent {}".format(i))
+        print("Loading of model weights to use for agent {}".format(i))
         agent.load(file_name)
 
 #! statistics
@@ -169,7 +169,13 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
             for agent in agents:
                 agent.update_target_weights()
     # ────────────────────────────────────────────────────────────────────────────────
-        if (testing): env.render();
+        if (testing): 
+            env.render()
+            if (step % 4 == 0 ):
+                # Take screenshot
+                pic = pyautogui.screenshot()
+                # Save the image
+                pic.save(output_dir+'/screenshots/Screenshot_{}.png'.format(step)) 
         # ─────────────────────────────────────────────────────────────────
         # if(episode > 100 and episode < 110): env.render();
         # if(episode > 500 and episode < 510): env.render();
