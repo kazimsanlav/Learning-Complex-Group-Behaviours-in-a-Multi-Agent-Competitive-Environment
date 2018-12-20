@@ -1,7 +1,6 @@
 
 import random
 import gym
-from gym import wrappers
 import make_env_
 import numpy as np
 import csv

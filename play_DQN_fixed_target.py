@@ -1,7 +1,6 @@
 
 import random
 import gym
-from gym import wrappers
 import make_env_
 import numpy as np
 import csv
@@ -28,18 +27,18 @@ batch_size = 32 # used for batch gradient descent update
 
 testing = True # render or not, expodation vs. exploration
 
-n_episodes = 100000 if not testing else 1 # number of simulations 
-n_steps = 100 if not testing else 32 # number of steps
+n_episodes = 100000 if not testing else 3 # number of simulations 
+n_steps = 100 if not testing else 500 # number of steps
 
-load_episode = 5250 
+load_episode = 13900 
 
 updating_target_freq = 50 # rate C, reset W` <- W
 
-output_dir = 'model_output/swarm/DQQ_fixed_target_10v1'
+output_dir = 'model_output/swarm/DQN_fixed_target_2v1'
 
 # ────────────────────────────────────────────────────────────────────────────────
-if testing:
-    import pyautogui
+# if testing:
+#     import pyautogui
 # ────────────────────────────────────────────────────────────────────────────────
 
 
@@ -171,11 +170,11 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
     # ────────────────────────────────────────────────────────────────────────────────
         if (testing): 
             env.render()
-            if (step % 4 == 0 ):
-                # Take screenshot
-                pic = pyautogui.screenshot()
-                # Save the image
-                pic.save(output_dir+'/screenshots/Screenshot_{}.png'.format(step)) 
+            # if (step % 4 == 0 ):
+            #     # Take screenshot
+            #     pic = pyautogui.screenshot()
+            #     # Save the image
+            #     pic.save(output_dir+'/screenshots/Screenshot_{}.png'.format(step)) 
         # ─────────────────────────────────────────────────────────────────
         # if(episode > 100 and episode < 110): env.render();
         # if(episode > 500 and episode < 510): env.render();
