@@ -10,6 +10,8 @@ from keras.layers import Dense
 from keras.optimizers import Adam
 import os # for creating directories
 
+#TODO: make epsilon 0.01, episode 13900 {:05d}, close column names,
+#TODO: n_steps 1450,updating_target_freq 725
 #^ Set parameters
 
 env = make_env_.make_env('swarm',benchmark=True)
@@ -30,7 +32,7 @@ testing = True # render or not, expodation vs. exploration
 n_episodes = 100000 if not testing else 3 # number of simulations 
 n_steps = 100 if not testing else 500 # number of steps
 
-load_episode = 13900 
+load_episode = 24700 
 
 updating_target_freq = 50 # rate C, reset W` <- W
 
@@ -140,15 +142,16 @@ loss_ = ['loss_{}'.format(i) for i in range(num_of_agents)]
 reward_ = ['reward_{}'.format(i) for i in range(num_of_agents)]
 statistics = ['episode','epsilon']+collision_+reward_+loss_
 
-if not testing:
-    with open(output_dir + '/statistics.csv', 'a') as csvFile:
-        writer = csv.writer(csvFile)
-        writer.writerow(statistics)
-    csvFile.close()
+#! closed column names
+# if not testing:
+#     with open(output_dir + '/statistics.csv', 'a') as csvFile:
+#         writer = csv.writer(csvFile)
+#         writer.writerow(statistics)
+#     csvFile.close()
 # ────────────────────────────────────────────────────────────────────────────────
 
 for episode in range(1,n_episodes+1): # iterate over new episodes of the game
-    if(episode % 500 == 0): 
+    if(episode % 500 == 0): # my idea for better exploration 
         n_steps+=50
         updating_target_freq+=25
     # ────────────────────────────────────────────────────────────────────────────────
