@@ -29,10 +29,10 @@ batch_size = 32 # used for batch gradient descent update
 
 testing = True # render or not, expodation vs. exploration
 
-n_episodes = 100000 if not testing else 3 # number of simulations 
-n_steps = 100 if not testing else 500 # number of steps
+n_episodes = 100000 if not testing else 50 # number of simulations 
+n_steps = 100 if not testing else 1000 # number of steps
 
-load_episode = 24700 
+load_episode = 14200 
 
 updating_target_freq = 50 # rate C, reset W` <- W
 
@@ -52,10 +52,10 @@ class DQNAgent:
         self.action_size = action_size # defined above
         self.memory = deque(maxlen=2000) # double-ended queue; removes the oldest element each time that you add a new element.
         self.gamma = 0.95 # discount rate
-        self.epsilon = 1.0 if not testing else 0.1 # exploration rate: how much to act randomly; more initially than later due to epsilon decay
+        self.epsilon = 1.0 if not testing else 0.01 # exploration rate: how much to act randomly; more initially than later due to epsilon decay
         self.epsilon_decay = (1-0.0005) # exponential decay rate for exploration prob
         self.epsilon_min = 0.01 # minimum amount of random exploration permitted
-        self.learning_rate = 0.0005 # learning rate of NN
+        self.learning_rate = 0.0005 if not testing else 0 # learning rate of NN
         self.evaluation_model = self._build_model()  
         self.target_model = self._build_model()  
     
@@ -207,7 +207,7 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
        
         states = next_states # update the states
     
-    print("episode: {}/{}, collisions: {}, epsilon: {:.2}".format(episode, n_episodes, collisions[0], agent.epsilon))
+    print("\n episode: {}/{}, collisions: {}, epsilon: {:.2}".format(episode, n_episodes, collisions[0], agent.epsilon))
     for i,agent in  enumerate(agents):
         if len(agent.memory) > batch_size:
             history = agent.replay(batch_size) # train the agent by replaying the experiences of the episode

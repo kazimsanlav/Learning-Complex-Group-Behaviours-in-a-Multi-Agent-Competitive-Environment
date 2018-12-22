@@ -27,12 +27,12 @@ batch_size = 32 # used for batch gradient descent update
 
 testing = True # render or not, expodation vs. exploration
 
-n_episodes = 100000 if not testing else 5 # number of simulations 
-n_steps = 100 if not testing else 500 # number of steps
+n_episodes = 100000 if not testing else 50 # number of simulations 
+n_steps = 100 if not testing else 200 # number of steps
 
-load_episode = 15100 
+load_episode = 4450 
 
-output_dir = 'model_output/swarm/DQN_2v1'
+output_dir = 'model_output/swarm/DQN_10v1'
 
 # # ────────────────────────────────────────────────────────────────────────────────
 if testing:
@@ -187,7 +187,7 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
        
         states = next_states # update the states
     
-    print("episode: {}/{}, collisions: {}, epsilon: {:.2}".format(episode, n_episodes, collisions[0], agent.epsilon))
+    print("\n episode: {}/{}, collisions: {}, epsilon: {:.2}".format(episode, n_episodes, collisions[0], agent.epsilon))
     for i,agent in  enumerate(agents):
         if len(agent.memory) > batch_size:
             history = agent.replay(batch_size) # train the agent by replaying the experiences of the episode
