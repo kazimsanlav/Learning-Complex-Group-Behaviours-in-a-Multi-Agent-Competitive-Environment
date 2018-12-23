@@ -32,7 +32,7 @@ testing = True # render or not, expodation vs. exploration
 n_episodes = 100000 if not testing else 50 # number of simulations 
 n_steps = 100 if not testing else 1000 # number of steps
 
-load_episode = 14200 
+load_episode = 13700 
 
 updating_target_freq = 50 # rate C, reset W` <- W
 
