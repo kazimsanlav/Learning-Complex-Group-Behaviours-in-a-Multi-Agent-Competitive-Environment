@@ -151,7 +151,7 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
     states = env.reset() # reset states at start of each new episode of the game
     
     for step in range(1,n_steps+1): # for every step
-        env.render()
+        # env.render()
 
         if (testing): 
             env.render()
