@@ -40,7 +40,7 @@ class Scenario(BaseScenario):
     def reset_world(self, world):
         # random properties for agents
         for i, agent in enumerate(world.agents):
-            agent.color = np.array([0.35+i*0.3, 0.85-i*0.1, 0.35+i*0.3]) if not agent.adversary else np.array([0.85, 0.35, 0.35])
+            agent.color = np.array([0.35, 0.85, 0.35]) if not agent.adversary else np.array([0.85, 0.35, 0.35])
             # random properties for landmarks
         for i, landmark in enumerate(world.landmarks):
             landmark.color = np.array([0.25, 0.25, 0.25])
@@ -98,14 +98,13 @@ class Scenario(BaseScenario):
         # agents are penalized for exiting the screen, so that they can be caught by the adversaries
         if x < 0.9:
             return 0
-        if x < 1.0:
-            return (x - 0.9) * 10
+        
         return min(np.exp(2 * x - 2), 10)
 
     def agent_reward(self, agent, world):
         # Agents are negatively rewarded if caught by adversaries
         rew = 0
-        shape = False
+        shape = True #!False
         adversaries = self.adversaries(world)
         if shape:  # reward can optionally be shaped (increased reward for increased distance from adversary)
             for adv in adversaries:

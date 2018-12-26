@@ -4,37 +4,38 @@ import gym
 import make_env_
 import numpy as np
 import csv
-from collections import deque
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.optimizers import Adam
-import os # for creating directories
+# from collections import deque
+import tensorflow as tf
+import os  # for creating directories
+
+from DPG import PolicyGradientAgent  # PG agent
 
 np.random.seed(1)
+tf.set_random_seed(1)
 
-#^ Set parameters
+# ^ Set parameters
 
-env = make_env_.make_env('swarm',benchmark=True)
+env = make_env_.make_env('swarm', benchmark=True)
 
 num_of_agents = env.n
 
-state_size = (2+2+2*(num_of_agents-1)*2) # [agent's velocity(2d vector) + agent's position(2d vector) + 
-                # other agent's relative position((n-1)*2d vector) + 
-                # other agent's relative velocity((n-1)*2d vector)) ] 
-                # in 3 agent case it is 2+2+2*2+2*2=12
-                
-action_size = 4 # discrete action space [up,down,left,right]
+state_size = (2+2+2*(num_of_agents-1)*2)
+# [agent's velocity(2d vector) + agent's position(2d vector) +
+# other agent's relative position((n-1)*2d vector) +
+# other agent's relative velocity((n-1)*2d vector)) ]
+# in 3 agent case it is 2+2+2*2+2*2=12
 
-# batch_size = 32 # used for batch gradient descent update
+action_size = 4  # discrete action space [up,down,left,right]
 
-testing = False # render or not, expodation vs. exploration
+testing = True  # render or not, expodation vs. exploration
+render = True
 
-n_episodes = 100000 if not testing else 50 # number of simulations 
-n_steps = 100 if not testing else 100 # number of steps
+n_episodes = 3000 if not testing else 7  # number of simulations
+n_steps = 200 if not testing else 300  # number of steps
 
-load_episode = 0 
+load_episode = 100
 
-output_dir = 'model_output/swarm/DPG'
+output_dir = 'model_output/swarm/DPG_fixedbound'
 
 # # ────────────────────────────────────────────────────────────────────────────────
 # if testing:
@@ -42,87 +43,27 @@ output_dir = 'model_output/swarm/DPG'
 #  ────────────────────────────────────────────────────────────────────────────────
 
 
-#^ Define agent
-class DPGAgent:
-    def __init__(self, state_size, action_size):
-        self.state_size = state_size # defined above
-        self.action_size = action_size # defined above
-        self.gamma = 0.95 # discount rate
-        self.learning_rate = 0.01 if not testing else 0 # learning rate of NN
-        self.states = []
-        self.gradients = []
-        self.rewards = []
-        self.probs = []
-        self.model = self._build_model()  
-    
-    def _build_model(self):
-        # neural net for approximating Q-value function: Q*(s,a) ~ Q(s,a;W)
-        model = Sequential() #fully connected NN
-        model.add(Dense(state_size*2, input_dim=self.state_size, activation='relu')) # 1st hidden layer
-        model.add(Dense(state_size*2, activation='relu')) # 2nd hidden layer
-        model.add(Dense(self.action_size, activation='softmax')) # 4 actions, so 4 output neurons
-        model.compile(loss='categorical_crossentropy',optimizer=Adam(lr=self.learning_rate))
-        return model
-    
-    def remember(self, state, action, prob, reward):
-        y = action[1:]
-        self.gradients.append(np.array(y).astype('float32') - prob)
-        self.states.append(state)
-        self.rewards.append(reward)
+# ^ Interact with environment
 
-    def act(self, state):
-        # state = state.reshape([1, state.shape[0]])
-        action_prob = self.model.predict(state, batch_size=1).flatten()
-        self.probs.append(action_prob)
-        prob = action_prob / np.sum(action_prob)
-        act_index = np.random.choice(self.action_size, 1, p=prob)[0]
-        onehot_action = np.zeros(action_size+1)
-        onehot_action[act_index+1] = 1
-        return onehot_action, prob
-
-    def discount_rewards(self, rewards):
-        discounted_rewards = np.zeros_like(rewards)
-        running_add = 0
-        for t in reversed(range(0, rewards.size)):
-            if rewards[t] != 0:
-                running_add = 0
-            running_add = running_add * self.gamma + rewards[t]
-            discounted_rewards[t] = running_add
-        return discounted_rewards
-
-    def train(self):
-        gradients = np.vstack(self.gradients)
-        rewards = np.vstack(self.rewards)
-        rewards = self.discount_rewards(rewards)
-        rewards = rewards / np.std(rewards - np.mean(rewards))
-        gradients *= rewards
-        X = np.squeeze(np.vstack([self.states]))
-        Y = self.probs + self.learning_rate * np.squeeze(np.vstack([gradients]))
-        history = self.model.train_on_batch(X, Y)
-        self.states, self.probs, self.gradients, self.rewards = [], [], [], []
-        return history
-
-    def load(self, name):
-        self.model.load_weights(name)
-
-    def save(self, name):
-        self.model.save_weights(name)
-
-#^ Interact with environment
-
-agents = [ DPGAgent(state_size, action_size) for agent in range(num_of_agents) ] # initialise agents
+agents = [PolicyGradientAgent(state_size, action_size)
+          for agent in range(num_of_agents)]  # initialize agents
 
 #! create model output folders
-for i,agent in enumerate(agents):
+for i, agent in enumerate(agents):
     if not os.path.exists(output_dir + "/weights/agent{}".format(i)):
         os.makedirs(output_dir + "/weights/agent{}".format(i))
 
-#! load weights if exist    
-for i,agent in enumerate(agents):
-    file_name = (output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(load_episode) + ".hdf5")
-    if os.path.isfile(file_name):
-        print("Loading weights to use for agent {}".format(i))
+#! load weights if exist
+for i, agent in enumerate(agents):
+    file_name = (output_dir + "/weights/agent{}/".format(i) +
+                 "weights_" + '{:04d}'.format(load_episode))
+    try:
         agent.load(file_name)
+        print("Loaded weights to use for agent {}".format(i))
+    except:
+        print("No weights to use for agent {}".format(i))
+    finally:
+        pass
 
 #! statistics
 # ────────────────────────────────────────────────────────────────────────────────
@@ -138,71 +79,91 @@ if not testing:
     csvFile.close()
 # ────────────────────────────────────────────────────────────────────────────────
 
-for episode in range(1,n_episodes+1): # iterate over new episodes of the game
-    if(episode % 500 == 0): n_steps+=50;
+for episode in range(1, n_episodes+1):  # iterate over new episodes of the game
+    # if(episode % 500 == 0):
+    #     n_steps += 50
     # ────────────────────────────────────────────────────────────────────────────────
-    #^ for statistics
-    statictics_row=[]
+    # ^ for statistics
+    statictics_row = []
     collisions = [0]*num_of_agents
     rewards = [0]*num_of_agents
     losses = [0]*num_of_agents
     # ────────────────────────────────────────────────────────────────────────────────
 
-    states = env.reset() # reset states at start of each new episode of the game
-    
-    for step in range(1,n_steps+1): # for every step
-        # env.render()
+    states = env.reset()  # reset states at start of each new episode of the game
 
-        if (testing): 
+    for step in range(1, n_steps+1):  # for every step
+
+        if (render):
             env.render()
-            # if (step % 4 == 0 ):
-            #     # Take screenshot
-            #     pic = pyautogui.screenshot()
-            #     # Save the image
-            #     pic.save(output_dir+'/screenshots/Screenshot_{}.png'.format(step)) 
-        # ─────────────────────────────────────────────────────────────────
-        # if(episode > 100 and episode < 110): env.render();
-        # if(episode > 500 and episode < 510): env.render();
-        # if(episode > 950 and episode < 1000): env.render();   
-        # ─────────────────────────────────────────────────────────────────
-        all_actions=[]
-        all_probs=[]
-        for state,agent in zip(states,agents):
-            state = np.reshape(state, [1, state_size]) #! reshape the state for DQN model
-            action_i, prob_i = agent.act(state)
-            all_actions.append(action_i)
-            all_probs.append(prob_i)
-        
-        next_states, rewards, dones, infos = env.step(all_actions) # take a step (update all agents)
+        # if(episode > 950):
+        #     env.render()
+
+           # if (step % 4 == 0 ):
+           #     # Take screenshot
+           #     pic = pyautogui.screenshot()
+           #     # Save the image
+           #     pic.save(output_dir+'/screenshots/Screenshot_{}.png'.format(step))
+
+        all_actions = []
+        all_actions_index = []
+        for state, agent in zip(states, agents):
+            # state = np.reshape(state, [1, state_size]) #! reshape the state for DQN model
+            act_index = agent.act(state)
+            all_actions_index.append(act_index)
+            onehot_action = np.zeros(action_size+1)
+            onehot_action[act_index+1] = 1
+            all_actions.append(onehot_action)
+
+        next_states, rewards, dones, infos = env.step(
+            all_actions)  # take a step (update all agents)
 
         # ─────────────────────────────────────────────────────────────────
-        #* collision,reward statistics
+        # * collision,reward statistics
         for i in range(num_of_agents):
             collisions[i] += (infos['collision'][i])
             rewards[i] += (rewards[i])
         # ────────────────────────────────────────────────────────────────────────────────
 
-        for state in next_states:
-            state = np.reshape(state, [1, state_size]) #! reshape the state for DQN model
+        # for state in next_states:
+        #     state = np.reshape(state, [1, state_size]) #! reshape the state for DQN model
 
-        for i,agent in enumerate(agents):
-            agent.remember(states[i], all_actions[i], all_probs[i], rewards[i]) 
-            # remember the previous timestep's state, actions, reward vs.        
-       
-        states = next_states # update the states
-    
-    print("\n episode: {}/{}, collisions: {}".format(episode, n_episodes, collisions[0]))
-    for agent in agents:
-        history = agent.train()
-        losses[i] += history
+        for i, agent in enumerate(agents):
+            agent.remember(states[i], all_actions_index[i], rewards[i])
+            # remember the previous timestep's state, actions, reward vs.
 
-        # if len(agent.memory) > batch_size:
-            # history = agent.replay(batch_size) # train the agent by replaying the experiences of the episode
-            # losses[i] += history.history['loss'][0]
-    
+        states = next_states  # update the states
+
+    # End of the episode
+    for i, agent in enumerate(agents):
+
+        rewards_sum = sum(agent.rewards)
+
+        if 'running_reward' not in globals():
+            running_reward = rewards_sum
+        else:
+            running_reward = running_reward * \
+                agent.gamma + rewards_sum * (1-agent.gamma)
+
+        value, loss = agent.learn()
+
+        losses[i] = loss
     # ────────────────────────────────────────────────────────────────────────────────
-    #! episode,collisions,rewards,losses statistics written    
-    statictics_row.append(episode)      
+
+    print("\n episode: {}/{}, collisions: {}, \
+    rewards: {:.2f}|{:.2f}|{:.2f},\
+    losses: {:.2f}|{:.2f}|{:.2f}".format(episode,
+                                         n_episodes,
+                                         collisions[0],
+                                         rewards[0],
+                                         rewards[1],
+                                         rewards[2],
+                                         losses[0],
+                                         losses[1],
+                                         losses[2]))
+
+    #! episode,collisions,rewards,losses statistics written
+    statictics_row.append(episode)
     statictics_row += (collisions)
     statictics_row += (rewards)
     statictics_row += (losses)
@@ -217,7 +178,6 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
     #! save weights
     if not testing:
         if episode % 50 == 0:
-            for i,agent in enumerate(agents):
-                agent.save(output_dir + "/weights/agent{}/".format(i) +"weights_" + '{:04d}'.format(episode) + ".hdf5")
-
-    
+            for i, agent in enumerate(agents):
+                agent.save(output_dir + "/weights/agent{}/".format(i) +
+                           "weights_" + '{:04d}'.format(episode))

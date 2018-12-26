@@ -3,3 +3,7 @@
 .vscode
 *.json
 *.hdf5
+*.meta
+*.index
+*.data-00000-of-00001
+*checkpoint
