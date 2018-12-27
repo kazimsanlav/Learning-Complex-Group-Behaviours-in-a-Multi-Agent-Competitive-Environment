@@ -28,9 +28,10 @@ action_size = 4 # discrete action space [up,down,left,right]
 batch_size = 32 # used for batch gradient descent update
 
 testing = True # render or not, expodation vs. exploration
+render = True
 
 n_episodes = 100000 if not testing else 50 # number of simulations 
-n_steps = 100 if not testing else 1000 # number of steps
+n_steps = 100 if not testing else 100 # number of steps
 
 load_episode = 13700 
 
@@ -51,11 +52,11 @@ class DQNAgent:
         self.state_size = state_size # defined above
         self.action_size = action_size # defined above
         self.memory = deque(maxlen=2000) # double-ended queue; removes the oldest element each time that you add a new element.
-        self.gamma = 0.95 # discount rate
+        self.gamma = 0.99 # discount rate
         self.epsilon = 1.0 if not testing else 0.01 # exploration rate: how much to act randomly; more initially than later due to epsilon decay
         self.epsilon_decay = (1-0.0005) # exponential decay rate for exploration prob
         self.epsilon_min = 0.01 # minimum amount of random exploration permitted
-        self.learning_rate = 0.0005 if not testing else 0 # learning rate of NN
+        self.learning_rate = 0.0001 if not testing else 0 # learning rate of NN
         self.evaluation_model = self._build_model()  
         self.target_model = self._build_model()  
     
@@ -158,7 +159,7 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
     #^ for statistics
     statictics_row=[]
     collisions = [0]*num_of_agents
-    rewards = [0]*num_of_agents
+    rewards_ = [0]*num_of_agents
     losses = [0]*num_of_agents
     # ────────────────────────────────────────────────────────────────────────────────
 
@@ -171,7 +172,7 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
             for agent in agents:
                 agent.update_target_weights()
     # ────────────────────────────────────────────────────────────────────────────────
-        if (testing): 
+        if (render): 
             env.render()
             # if (step % 4 == 0 ):
             #     # Take screenshot
@@ -195,7 +196,7 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
         #* collision,reward statistics
         for i in range(num_of_agents):
             collisions[i] += (infos['collision'][i])
-            rewards[i] += (rewards[i])
+            rewards_[i] += (rewards[i])
         # ────────────────────────────────────────────────────────────────────────────────
 
         for state in next_states:
@@ -207,19 +208,30 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
        
         states = next_states # update the states
     
-    print("\n episode: {}/{}, collisions: {}, epsilon: {:.2}".format(episode, n_episodes, collisions[0], agent.epsilon))
     for i,agent in  enumerate(agents):
         if len(agent.memory) > batch_size:
             history = agent.replay(batch_size) # train the agent by replaying the experiences of the episode
             
             losses[i] += history.history['loss'][0]
     
+    print("\n episode: {}/{}, collisions: {}, \
+    rewards: {:.2f}|{:.2f}|{:.2f},\
+    losses: {:.2f}|{:.2f}|{:.2f}".format(episode,
+                                         n_episodes,
+                                         collisions[0],
+                                         rewards_[0],
+                                         rewards_[1],
+                                         rewards_[2],
+                                         losses[0],
+                                         losses[1],
+                                         losses[2]))
+
     # ────────────────────────────────────────────────────────────────────────────────
     #* episode,epsilon,collisions,rewards,losses statistics written    
     statictics_row.append(episode)      
     statictics_row.append(agents[0].epsilon)
     statictics_row += (collisions)
-    statictics_row += (rewards)
+    statictics_row += (rewards_)
     statictics_row += (losses)
 
     if not testing:

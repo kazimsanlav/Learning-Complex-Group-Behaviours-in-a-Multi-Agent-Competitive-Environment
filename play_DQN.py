@@ -26,13 +26,14 @@ action_size = 4 # discrete action space [up,down,left,right]
 batch_size = 32 # used for batch gradient descent update
 
 testing = True # render or not, expodation vs. exploration
+render = True
 
 n_episodes = 100000 if not testing else 50 # number of simulations 
 n_steps = 100 if not testing else 100 # number of steps
 
-load_episode = 14650 
+load_episode = 18000 
 
-output_dir = 'model_output/swarm/DQN_2v1_i7'
+output_dir = 'model_output/swarm/DQN_2v1_i5'
 
 # # ────────────────────────────────────────────────────────────────────────────────
 if testing:
@@ -144,14 +145,14 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
     #^ for statistics
     statictics_row=[]
     collisions = [0]*num_of_agents
-    rewards = [0]*num_of_agents
+    rewards_ = [0]*num_of_agents
     losses = [0]*num_of_agents
     # ────────────────────────────────────────────────────────────────────────────────
 
     states = env.reset() # reset states at start of each new episode of the game
     
     for step in range(1,n_steps+1): # for every step
-        if (testing): 
+        if (render): 
             env.render()
             # if (step % 4 == 0 ):
             #     # Take screenshot
@@ -175,7 +176,7 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
         #* collision,reward statistics
         for i in range(num_of_agents):
             collisions[i] += (infos['collision'][i])
-            rewards[i] += (rewards[i])
+            rewards_[i] += (rewards[i])
         # ────────────────────────────────────────────────────────────────────────────────
 
         for state in next_states:
@@ -187,19 +188,30 @@ for episode in range(1,n_episodes+1): # iterate over new episodes of the game
        
         states = next_states # update the states
     
-    print("\n episode: {}/{}, collisions: {}, epsilon: {:.2}".format(episode, n_episodes, collisions[0], agent.epsilon))
     for i,agent in  enumerate(agents):
         if len(agent.memory) > batch_size:
             history = agent.replay(batch_size) # train the agent by replaying the experiences of the episode
             
             losses[i] += history.history['loss'][0]
     
+    print("\n episode: {}/{}, collisions: {}, \
+    rewards: {:.2f}|{:.2f}|{:.2f},\
+    losses: {:.2f}|{:.2f}|{:.2f}".format(episode,
+                                         n_episodes,
+                                         collisions[0],
+                                         rewards_[0],
+                                         rewards_[1],
+                                         rewards_[2],
+                                         losses[0],
+                                         losses[1],
+                                         losses[2]))
+
     # ────────────────────────────────────────────────────────────────────────────────
     #! episode,epsilon,collisions,rewards,losses statistics written    
     statictics_row.append(episode)      
     statictics_row.append(agents[0].epsilon)
     statictics_row += (collisions)
-    statictics_row += (rewards)
+    statictics_row += (rewards_)
     statictics_row += (losses)
 
     if not testing:

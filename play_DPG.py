@@ -30,12 +30,12 @@ action_size = 4  # discrete action space [up,down,left,right]
 testing = True  # render or not, expodation vs. exploration
 render = True
 
-n_episodes = 3000 if not testing else 7  # number of simulations
-n_steps = 200 if not testing else 300  # number of steps
+n_episodes = 2000 if not testing else 3  # number of simulations
+n_steps = 200 if not testing else 1000  # number of steps
 
-load_episode = 100
+load_episode = 15000
 
-output_dir = 'model_output/swarm/DPG_fixedbound'
+output_dir = 'model_output/swarm/DPG_10v3'
 
 # # ────────────────────────────────────────────────────────────────────────────────
 # if testing:
@@ -86,7 +86,7 @@ for episode in range(1, n_episodes+1):  # iterate over new episodes of the game
     # ^ for statistics
     statictics_row = []
     collisions = [0]*num_of_agents
-    rewards = [0]*num_of_agents
+    rewards_ = [0]*num_of_agents
     losses = [0]*num_of_agents
     # ────────────────────────────────────────────────────────────────────────────────
 
@@ -96,14 +96,6 @@ for episode in range(1, n_episodes+1):  # iterate over new episodes of the game
 
         if (render):
             env.render()
-        # if(episode > 950):
-        #     env.render()
-
-           # if (step % 4 == 0 ):
-           #     # Take screenshot
-           #     pic = pyautogui.screenshot()
-           #     # Save the image
-           #     pic.save(output_dir+'/screenshots/Screenshot_{}.png'.format(step))
 
         all_actions = []
         all_actions_index = []
@@ -122,7 +114,7 @@ for episode in range(1, n_episodes+1):  # iterate over new episodes of the game
         # * collision,reward statistics
         for i in range(num_of_agents):
             collisions[i] += (infos['collision'][i])
-            rewards[i] += (rewards[i])
+            rewards_[i] += (rewards[i])
         # ────────────────────────────────────────────────────────────────────────────────
 
         # for state in next_states:
@@ -155,9 +147,9 @@ for episode in range(1, n_episodes+1):  # iterate over new episodes of the game
     losses: {:.2f}|{:.2f}|{:.2f}".format(episode,
                                          n_episodes,
                                          collisions[0],
-                                         rewards[0],
-                                         rewards[1],
-                                         rewards[2],
+                                         rewards_[0],
+                                         rewards_[1],
+                                         rewards_[2],
                                          losses[0],
                                          losses[1],
                                          losses[2]))
@@ -165,7 +157,7 @@ for episode in range(1, n_episodes+1):  # iterate over new episodes of the game
     #! episode,collisions,rewards,losses statistics written
     statictics_row.append(episode)
     statictics_row += (collisions)
-    statictics_row += (rewards)
+    statictics_row += (rewards_)
     statictics_row += (losses)
 
     if not testing:

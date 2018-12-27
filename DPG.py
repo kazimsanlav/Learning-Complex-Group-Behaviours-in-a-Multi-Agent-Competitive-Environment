@@ -34,9 +34,9 @@ class PolicyGradientAgent:
             self.tf_obs = tf.placeholder(
                 tf.float32, [None, self.state_size], name="observations")
             self.tf_acts = tf.placeholder(
-                tf.int32, [None, ], name="actions_indexes")
-            self.tf_vt = tf.placeholder(
-                tf.float32, [None, ], name="actions_values")
+                tf.int32, [None, ], name="action_indexes")
+            self.tf_rew = tf.placeholder(
+                tf.float32, [None, ], name="action_rewards")
         # layer1
         layer = tf.layers.dense(
             inputs=self.tf_obs,
@@ -78,12 +78,15 @@ class PolicyGradientAgent:
                 logits=all_act, labels=self.tf_acts)   
                 # this is negative log of the chosen action
             # reward guided loss
-            loss = tf.reduce_mean(neg_log_prob * self.tf_vt)
+            loss = tf.reduce_mean(neg_log_prob * self.tf_rew)
             self.loss = loss
 
         with tf.name_scope('train'):
             self.train_op = tf.train.AdamOptimizer(
                 self.learning_rate).minimize(loss)
+                #This method simply combines calls compute_gradients() and
+                #apply_gradients() 
+    
 
     def act(self, observation):
         '''
@@ -118,9 +121,9 @@ class PolicyGradientAgent:
             # shape=[None, ]
             self.tf_acts: np.array(self.actions),
             # shape=[None, ]
-            self.tf_vt: discounted_normalized_rewards,
+            self.tf_rew: discounted_normalized_rewards,
         })
-
+        # empty the memory after gradient update
         self.observations = []
         self.actions = []
         self.rewards = []
