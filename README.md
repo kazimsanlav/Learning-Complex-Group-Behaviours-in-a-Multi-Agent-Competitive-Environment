@@ -1,4 +1,5 @@
-# Learning Complex Group Behaviors in a Multi-Agent Competitive Environment
+# Learning Complex Group Behaviors in a Multi-Agent Competitive Environment 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2528537.svg)](https://doi.org/10.5281/zenodo.2528537)
 
 ## Introduction
 
