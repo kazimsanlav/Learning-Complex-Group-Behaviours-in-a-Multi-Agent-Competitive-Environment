@@ -1,6 +1,5 @@
 # Learning Complex Group Behaviors in a Multi-Agent Competitive Environment 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2528537.svg)](https://doi.org/10.5281/zenodo.2528537)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2528551.svg)](https://doi.org/10.5281/zenodo.2528551)
 ## Introduction
 
 The aim of this project is to use reinforcement learning algorithms to explore predator-prey
