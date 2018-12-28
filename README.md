@@ -24,7 +24,7 @@ other agents.
 
 ![1546016860041](assets/1546016860041.png)
 
-​						Figure 1: A multiagent environment (Chincoli et. al).
+  **Figure 1:** A multiagent environment (Chincoli et. al).
 
 Three RF(Reinforcement Learning) algorithms used in this project for agents to learn their optimal policies in order to maximize their expected cumulative feature reward.  
 
@@ -46,15 +46,15 @@ Details and derivations can be found on the **[paper](paper/Swarm.pdf)**.
 
 ![algo1](assets/algo1.jpg)
 
-Figure 2 : Algorithm 1 Epsilon, Collision & Reward versus Episode are plotted for each agent. For this model, the learning rate = 0.0001 & gamma = 0.99
+  **Figure 2:** Algorithm 1 Epsilon, Collision & Reward versus Episode are plotted for each agent. For this model, the learning rate = 0.0001 & gamma = 0.99
 
 ![algo2](assets/algo2.jpg)
 
-Figure 3 : Algorithm 2 Epsilon, Collision & Reward versus Episode are plotted for each agent. For this model, the learning rate = 0.001 & gamma = 0.99
+  **Figure 3:** Algorithm 2 Epsilon, Collision & Reward versus Episode are plotted for each agent. For this model, the learning rate = 0.001 & gamma = 0.99
 
 ![algo3](assets/algo3.jpg)
 
-Figure 5: Algorithm 3 Collision, Reward & Loss versus Episode are plotted for each agent. Agent 0: predator; agent 1 & agent 2: prey.
+  **Figure 4:** Algorithm 3 Collision, Reward & Loss versus Episode are plotted for each agent. Agent 0: predator; agent 1 & agent 2: prey.
 
 ## Some of the Learned Strategies
 
