@@ -72,6 +72,11 @@ Details and derivations can be found on the **[paper](paper/Swarm.pdf)**.
 
 ![DPG_2v1_10000](assets/DPG_2v1_10000.gif) ![DPG_2v1_15000](assets/DPG_2v1_15000.gif)
 
+## Citation
+
+If you use this work, please cite it as [here](CITATION.cff).
+
+
 ## References
 
 Chincoli, Michele, and Antonio Liotta. "Self-learning power control in wireless sensor networks."
