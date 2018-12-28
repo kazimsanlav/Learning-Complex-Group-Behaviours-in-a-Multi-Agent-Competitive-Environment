@@ -64,7 +64,7 @@ Figure 5: Algorithm 3 Collision, Reward & Loss versus Episode are plotted for ea
 
 ![DPG_1v2_10000](assets/DPG_1v2_10000-1546023904471.gif) ![DPG_1v2_15000](assets/DPG_1v2_15000-1546024468757.gif)
 
-
+---
 
 ### DPG 2v1
 
@@ -72,7 +72,7 @@ Figure 5: Algorithm 3 Collision, Reward & Loss versus Episode are plotted for ea
 
 ![DPG_2v1_10000](assets/DPG_2v1_10000.gif) ![DPG_2v1_15000](assets/DPG_2v1_15000.gif)
 
-## Referances
+## References
 
 Chincoli, Michele, and Antonio Liotta. "Self-learning power control in wireless sensor networks."
 Sensors 18.2 (2018): 375.  
