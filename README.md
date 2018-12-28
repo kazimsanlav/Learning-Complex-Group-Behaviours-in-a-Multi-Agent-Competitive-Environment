@@ -1,4 +1,5 @@
-# Learning Complex Group Behaviors in a Multi-Agent Competitive Environment
+# Learning Complex Group Behaviors in a Multi-Agent Competitive Environment 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2528537.svg)](https://doi.org/10.5281/zenodo.2528537)
 
 ## Introduction
 
@@ -24,7 +25,7 @@ other agents.
 
 ![1546016860041](assets/1546016860041.png)
 
-​						Figure 1: A multiagent environment (Chincoli et. al).
+  **Figure 1:** A multiagent environment (Chincoli et. al).
 
 Three RF(Reinforcement Learning) algorithms used in this project for agents to learn their optimal policies in order to maximize their expected cumulative feature reward.  
 
@@ -46,15 +47,15 @@ Details and derivations can be found on the **[paper](paper/Swarm.pdf)**.
 
 ![algo1](assets/algo1.jpg)
 
-Figure 2 : Algorithm 1 Epsilon, Collision & Reward versus Episode are plotted for each agent. For this model, the learning rate = 0.0001 & gamma = 0.99
+  **Figure 2:** Algorithm 1 Epsilon, Collision & Reward versus Episode are plotted for each agent. For this model, the learning rate = 0.0001 & gamma = 0.99
 
 ![algo2](assets/algo2.jpg)
 
-Figure 3 : Algorithm 2 Epsilon, Collision & Reward versus Episode are plotted for each agent. For this model, the learning rate = 0.001 & gamma = 0.99
+  **Figure 3:** Algorithm 2 Epsilon, Collision & Reward versus Episode are plotted for each agent. For this model, the learning rate = 0.001 & gamma = 0.99
 
 ![algo3](assets/algo3.jpg)
 
-Figure 5: Algorithm 3 Collision, Reward & Loss versus Episode are plotted for each agent. Agent 0: predator; agent 1 & agent 2: prey.
+  **Figure 4:** Algorithm 3 Collision, Reward & Loss versus Episode are plotted for each agent. Agent 0: predator; agent 1 & agent 2: prey.
 
 ## Some of the Learned Strategies
 
@@ -64,7 +65,7 @@ Figure 5: Algorithm 3 Collision, Reward & Loss versus Episode are plotted for ea
 
 ![DPG_1v2_10000](assets/DPG_1v2_10000-1546023904471.gif) ![DPG_1v2_15000](assets/DPG_1v2_15000-1546024468757.gif)
 
-
+---
 
 ### DPG 2v1
 
@@ -72,7 +73,23 @@ Figure 5: Algorithm 3 Collision, Reward & Loss versus Episode are plotted for ea
 
 ![DPG_2v1_10000](assets/DPG_2v1_10000.gif) ![DPG_2v1_15000](assets/DPG_2v1_15000.gif)
 
-## Referances
+## Citation
+
+If you use this work, please cite it as below:
+
+@misc{sanlav_2018_2528537, 
+  author       = {Sanlav and  
+                  Nabi},  
+  title        = {{Learning Complex Group Behaviors in a Multi-Agent  
+                   Competitive Environment}},  
+  month        = dec,  
+  year         = 2018,  
+  doi          = {10.5281/zenodo.2528537},  
+  url          = {https://doi.org/10.5281/zenodo.2528537}  
+}
+
+
+## References
 
 Chincoli, Michele, and Antonio Liotta. "Self-learning power control in wireless sensor networks."
 Sensors 18.2 (2018): 375.  
