@@ -1,5 +1,7 @@
 # Learning Complex Group Behaviors in a Multi-Agent Competitive Environment 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2528551.svg)](https://doi.org/10.5281/zenodo.2528551)
+
+
 ## Introduction
 
 The aim of this project is to use reinforcement learning algorithms to explore predator-prey
@@ -76,17 +78,17 @@ Details and derivations can be found on the **[paper](paper/Swarm.pdf)**.
 
 If you use this work, please cite it as below:
 
-@misc{sanlav_2018_2528537, 
-  author       = {Sanlav and  
-                  Nabi},  
-  title        = {{Learning Complex Group Behaviors in a Multi-Agent  
-                   Competitive Environment}},  
+@misc{kazim_sanlav_2018_2528551,  
+  author       = {kazim sanlav and  
+                  afshan nabi},  
+  title        = {{kazimsanlav/Learning-Complex-Group-Behaviours-in-a   
+                   -Multi-Agent-Competitive-Environment: Paper  
+                   reviewed}},  
   month        = dec,  
   year         = 2018,  
-  doi          = {10.5281/zenodo.2528537},  
-  url          = {https://doi.org/10.5281/zenodo.2528537}  
+  doi          = {10.5281/zenodo.2528551},  
+  url          = {https://doi.org/10.5281/zenodo.2528551}  
 }
-
 
 ## References
 
