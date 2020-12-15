@@ -1,6 +1,22 @@
 # Learning Complex Group Behaviors in a Multi-Agent Competitive Environment 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2528551.svg)](https://doi.org/10.5281/zenodo.2528551)
 
+## Some of the Learned Strategies
+
+### DPG 1v2
+
+![DPG_1v2_500](assets/DPG_1v2_500-1546023733929.gif) ![DPG_1v2_5000](assets/DPG_1v2_5000.gif)
+
+![DPG_1v2_10000](assets/DPG_1v2_10000-1546023904471.gif) ![DPG_1v2_15000](assets/DPG_1v2_15000-1546024468757.gif)
+
+---
+
+### DPG 2v1
+
+![DPG_2v1_500](assets/DPG_2v1_500.gif) ![DPG_2v1_5000](assets/DPG_2v1_5000.gif)
+
+![DPG_2v1_10000](assets/DPG_2v1_10000.gif) ![DPG_2v1_15000](assets/DPG_2v1_15000.gif)
+
 
 ## Introduction
 
@@ -34,15 +50,9 @@ Details and derivations can be found on the **[paper](paper/Swarm.pdf)**.
 
 ### 1. Q-learning with experience replay
 
-![1546017313166](assets/1546017313166.png)
-
 ### 2. Q-learning with experience replay and a fixed Q-target network
 
-![1546017385127](assets/1546017385127.png)
-
 ### 3. Monte-Carlo Policy Gradient
-
-![1546017539834](assets/1546017539834.png)
 
 ## Peformance
 
@@ -57,22 +67,6 @@ Details and derivations can be found on the **[paper](paper/Swarm.pdf)**.
 ![algo3](assets/algo3.jpg)
 
   **Figure 4:** Algorithm 3 Collision, Reward & Loss versus Episode are plotted for each agent. Agent 0: predator; agent 1 & agent 2: prey.
-
-## Some of the Learned Strategies
-
-### DPG 1v2
-
-![DPG_1v2_500](assets/DPG_1v2_500-1546023733929.gif) ![DPG_1v2_5000](assets/DPG_1v2_5000.gif)
-
-![DPG_1v2_10000](assets/DPG_1v2_10000-1546023904471.gif) ![DPG_1v2_15000](assets/DPG_1v2_15000-1546024468757.gif)
-
----
-
-### DPG 2v1
-
-![DPG_2v1_500](assets/DPG_2v1_500.gif) ![DPG_2v1_5000](assets/DPG_2v1_5000.gif)
-
-![DPG_2v1_10000](assets/DPG_2v1_10000.gif) ![DPG_2v1_15000](assets/DPG_2v1_15000.gif)
 
 ## Citation
 
